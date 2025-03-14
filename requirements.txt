@@ -2,4 +2,4 @@ streamlit
 numpy
 joblib
 scikit-learn
-catboost
+catboost==1.2.7
