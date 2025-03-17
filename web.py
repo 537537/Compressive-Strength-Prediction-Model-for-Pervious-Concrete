@@ -3,11 +3,24 @@ import numpy as np
 import joblib
 import os
 
-# 自定义 CSS 以更改字体
+# 自定义 CSS 以更改字体和按钮颜色
 st.markdown(
     """
     <style>
     * { font-family: 'Times New Roman', serif; }
+    
+    div.stButton > button {
+        background-color: #007BFF; /* 按钮背景颜色（蓝色） */
+        color: white; /* 按钮文字颜色 */
+        border-radius: 5px; /* 圆角边框 */
+        border: 1px solid #0056b3; /* 按钮边框 */
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+    
+    div.stButton > button:hover {
+        background-color: #0056b3; /* 鼠标悬停时变深蓝 */
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -22,7 +35,7 @@ MODEL_PATH = "final_catboost_model.pkl"
 SCALER_PATH = "scaler.pkl"
 
 if not os.path.exists(MODEL_PATH) or not os.path.exists(SCALER_PATH):
-    st.error("模型或标准化器文件缺失，请检查文件路径！")
+    st.error("Model or scaler file is missing, please check the file path!")
 else:
     # 加载模型和标准化器
     model = joblib.load(MODEL_PATH)
@@ -57,7 +70,7 @@ else:
             prediction = model.predict(input_scaled)[0]
 
             # 显示结果
-            st.success(f"Predicted Compressive Strength of Pervious Concrete：{prediction:.2f} MPa")
+            st.success(f"Predicted Compressive Strength of Pervious Concrete: {prediction:.2f} MPa")
         except Exception as e:
             st.error(f"An error occurred during prediction: {e}")
 
