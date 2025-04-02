@@ -48,7 +48,7 @@ else:
         W_C = st.number_input("W/C (Water-Cement Ratio)", min_value=0.0, value=0.0, step=0.01)
         Dmin = st.number_input("Dmin (Minimum Aggregate Size)", min_value=0.0, value=0.0, step=0.01)
         Porosity = st.number_input("Porosity", min_value=0.0, value=0.0, step=0.01)
-        Diameter = st.number_input("Specimen Size (Cylinder: diameter; Cube: side length)", min_value=0.0, value=0.0, step=0.1)
+        Diameter = st.number_input("Size (Cylinder: diameter; Cube: side length)", min_value=0.0, value=0.0, step=0.1)
 
     with col2:
         A_C = st.number_input("A/C (Aggregate-Cement Ratio)", min_value=0.0, value=0.0, step=0.01)
