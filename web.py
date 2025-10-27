@@ -3,8 +3,8 @@ import numpy as np
 import joblib
 import os
 import shap
-import matplotlib.pyplot as plt
 import pandas as pd
+import streamlit.components.v1 as components
 
 # ========== 页面配置 ==========
 st.set_page_config(
@@ -40,7 +40,7 @@ div.stButton > button {
     font-weight: bold;
     width: 250px !important;
     transition: all 0.3s ease;
-    margin: 20px auto;
+    margin: 30px auto;
     display: block;
 }
 div.stButton > button:hover {
@@ -100,7 +100,6 @@ else:
     # ========== 预测按钮 ==========
     predict_button = st.button("🔮 Predict Compressive Strength")
 
-    # ========== 执行预测 ==========
     if predict_button:
         try:
             feature_names = ["W/C", "A/C", "Dmin", "ASR", "Porosity", "Shape", "Diameter", "Height"]
@@ -120,29 +119,21 @@ else:
             </div>
             """, unsafe_allow_html=True)
 
-            # ========== SHAP Force Plot ==========
+            # ========== SHAP HTML Force Plot ==========
             st.markdown("### 🔹 SHAP Force Plot (Feature Contributions)")
 
             explainer = shap.Explainer(model)
             full_explanation = explainer(input_scaled_df)
 
-            # 去掉 base_value
-            plot_explanation = shap.Explanation(
-                values=full_explanation.values[0],
-                base_values=None,
-                data=None,
-                feature_names=full_explanation.feature_names
+            # 使用 HTML 交互式 Force Plot
+            force_html = shap.plots.force(
+                full_explanation[0],  # 单样本
+                matplotlib=False,
+                show=False
             )
 
-            force_plot_fig = shap.plots.force(
-                plot_explanation,
-                matplotlib=True,
-                show=False,
-                contribution_threshold=0
-            )
-
-            st.pyplot(force_plot_fig, bbox_inches='tight')
-            plt.close(force_plot_fig)
+            # 在 Streamlit 中显示
+            components.html(force_html.data, height=300)
 
         except Exception as e:
             st.error(f"❌ An error occurred during prediction or SHAP computation: {e}")
