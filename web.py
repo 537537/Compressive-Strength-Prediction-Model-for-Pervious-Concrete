@@ -31,20 +31,21 @@ p, label {
     font-size: 16px;
 }
 div.stButton > button {
-    width: 100%;
     background: linear-gradient(90deg, #007bff, #0056b3);
     color: white;
     border: none;
-    border-radius: 10px;
-    padding: 10px 0;
-    font-size: 18px;
+    border-radius: 15px;
+    padding: 15px 0;
+    font-size: 20px;
     font-weight: bold;
+    width: 250px !important;
     transition: all 0.3s ease;
-    font-family: 'Times New Roman', serif;
+    margin: 20px auto;
+    display: block;
 }
 div.stButton > button:hover {
     background: linear-gradient(90deg, #0056b3, #003d80);
-    transform: scale(1.03);
+    transform: scale(1.05);
 }
 .result-box {
     background-color: #f0f8ff;
@@ -97,9 +98,7 @@ else:
         Height = st.number_input("Specimen Height", min_value=0.0, value=200.0, step=1.0)
 
     # ========== 预测按钮 ==========
-    st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
-    predict_button = st.button("🔮 Predict Compressive Strength  ")
-    st.markdown("</div>", unsafe_allow_html=True)
+    predict_button = st.button("🔮 Predict Compressive Strength")
 
     # ========== 执行预测 ==========
     if predict_button:
@@ -127,9 +126,10 @@ else:
             explainer = shap.Explainer(model)
             full_explanation = explainer(input_scaled_df)
 
+            # 去掉 base_value
             plot_explanation = shap.Explanation(
                 values=full_explanation.values[0],
-                base_values=full_explanation.base_values[0],
+                base_values=None,
                 data=None,
                 feature_names=full_explanation.feature_names
             )
