@@ -3,8 +3,8 @@ import numpy as np
 import joblib
 import os
 import shap
+import matplotlib.pyplot as plt
 import pandas as pd
-import streamlit.components.v1 as components
 
 # ========== 页面配置 ==========
 st.set_page_config(
@@ -31,21 +31,20 @@ p, label {
     font-size: 16px;
 }
 div.stButton > button {
+    width: 100%;
     background: linear-gradient(90deg, #007bff, #0056b3);
     color: white;
     border: none;
-    border-radius: 15px;
-    padding: 15px 0;
-    font-size: 20px;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 18px;
     font-weight: bold;
-    width: 250px !important;
     transition: all 0.3s ease;
-    margin: 30px auto;
-    display: block;
+    font-family: 'Times New Roman', serif;
 }
 div.stButton > button:hover {
     background: linear-gradient(90deg, #0056b3, #003d80);
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 .result-box {
     background-color: #f0f8ff;
@@ -98,8 +97,11 @@ else:
         Height = st.number_input("Specimen Height", min_value=0.0, value=200.0, step=1.0)
 
     # ========== 预测按钮 ==========
+    st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
     predict_button = st.button("🔮 Predict Compressive Strength")
+    st.markdown("</div>", unsafe_allow_html=True)
 
+    # ========== 执行预测 ==========
     if predict_button:
         try:
             feature_names = ["W/C", "A/C", "Dmin", "ASR", "Porosity", "Shape", "Diameter", "Height"]
@@ -119,21 +121,28 @@ else:
             </div>
             """, unsafe_allow_html=True)
 
-            # ========== SHAP HTML Force Plot ==========
+            # ========== SHAP Force Plot ==========
             st.markdown("### 🔹 SHAP Force Plot (Feature Contributions)")
 
             explainer = shap.Explainer(model)
             full_explanation = explainer(input_scaled_df)
 
-            # 使用 HTML 交互式 Force Plot
-            force_html = shap.plots.force(
-                full_explanation[0],  # 单样本
-                matplotlib=False,
-                show=False
+            plot_explanation = shap.Explanation(
+                values=full_explanation.values[0],
+                base_values=full_explanation.base_values[0],
+                data=None,
+                feature_names=full_explanation.feature_names
             )
 
-            # 在 Streamlit 中显示
-            components.html(force_html.data, height=300)
+            force_plot_fig = shap.plots.force(
+                plot_explanation,
+                matplotlib=True,
+                show=False,
+                contribution_threshold=0
+            )
+
+            st.pyplot(force_plot_fig, bbox_inches='tight')
+            plt.close(force_plot_fig)
 
         except Exception as e:
             st.error(f"❌ An error occurred during prediction or SHAP computation: {e}")
