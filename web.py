@@ -98,7 +98,7 @@ else:
 
     # ========== 预测按钮 ==========
     st.markdown("<div style='text-align:center;'>", unsafe_allow_html=True)
-    predict_button = st.button("🔮 Predict Compressive Strength")
+    predict_button = st.button("🔮 Predict Compressive Strength  ")
     st.markdown("</div>", unsafe_allow_html=True)
 
     # ========== 执行预测 ==========
