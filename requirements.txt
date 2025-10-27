@@ -3,3 +3,4 @@ numpy
 joblib
 scikit-learn
 catboost==1.2.7
+shap
