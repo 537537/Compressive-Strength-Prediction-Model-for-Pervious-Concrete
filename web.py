@@ -31,20 +31,22 @@ p, label {
     font-size: 16px;
 }
 div.stButton > button {
-    width: 100%;
+    width: 250px;
     background: linear-gradient(90deg, #007bff, #0056b3);
     color: white;
     border: none;
-    border-radius: 10px;
-    padding: 10px 0;
-    font-size: 18px;
+    border-radius: 15px;
+    padding: 15px 0;
+    font-size: 20px;
     font-weight: bold;
     transition: all 0.3s ease;
+    display: block;
+    margin: 20px auto;
     font-family: 'Times New Roman', serif;
 }
 div.stButton > button:hover {
     background: linear-gradient(90deg, #0056b3, #003d80);
-    transform: scale(1.03);
+    transform: scale(1.05);
 }
 .result-box {
     background-color: #f0f8ff;
@@ -129,7 +131,7 @@ else:
 
             plot_explanation = shap.Explanation(
                 values=full_explanation.values[0],
-                base_values=full_explanation.base_values[0],
+                base_values=full_explanation.base_values[0],  # 必须保留数值
                 data=None,
                 feature_names=full_explanation.feature_names
             )
@@ -141,6 +143,12 @@ else:
                 contribution_threshold=0
             )
 
+            # ===== 隐藏 base value 文本 =====
+            for ax in force_plot_fig.get_axes():
+                for text in ax.texts:
+                    if "base value" in text.get_text().lower():
+                        text.set_visible(False)
+
             st.pyplot(force_plot_fig, bbox_inches='tight')
             plt.close(force_plot_fig)
 
@@ -150,3 +158,4 @@ else:
 # ========== 底部信息 ==========
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center; font-size:14px; color:gray;'>Developed by Q.D. | Powered by Streamlit & CatBoost | SHAP Interpretation Enabled</p>", unsafe_allow_html=True)
+
