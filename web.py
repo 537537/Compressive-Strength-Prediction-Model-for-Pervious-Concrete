@@ -17,7 +17,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 .stApp {
-    background: linear-gradient(135deg, #e6f0ff, #ffffff);
+    background: #ffffff;
 }
 h1 {
     text-align: center;
