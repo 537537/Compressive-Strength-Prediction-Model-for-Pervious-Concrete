@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import joblib
 import os
+import matplotlib.pyplot as plt
 
 # ========== 页面配置 ==========
 st.set_page_config(
@@ -13,12 +14,9 @@ st.set_page_config(
 # ========== 自定义 CSS 样式 ==========
 st.markdown("""
 <style>
-/* 整体背景渐变 */
 .stApp {
     background: linear-gradient(135deg, #e6f0ff, #ffffff);
 }
-
-/* 标题美化 */
 h1 {
     text-align: center;
     color: #003366;
@@ -26,20 +24,14 @@ h1 {
     font-weight: bold;
     font-size: 32px !important;
 }
-
-/* 副标题样式 */
 p, label {
     font-family: 'Times New Roman', serif;
     font-size: 16px;
 }
-
-/* 输入框圆角样式 */
 div[data-baseweb="input"] > div {
     border-radius: 10px;
     border: 1px solid #80bfff;
 }
-
-/* 按钮样式 */
 div.stButton > button {
     width: 100%;
     background: linear-gradient(90deg, #007bff, #0056b3);
@@ -56,8 +48,6 @@ div.stButton > button:hover {
     background: linear-gradient(90deg, #0056b3, #003d80);
     transform: scale(1.03);
 }
-
-/* 预测结果卡片 */
 .result-box {
     background-color: #f0f8ff;
     border: 2px solid #99ccff;
@@ -75,22 +65,21 @@ div.stButton > button:hover {
 </style>
 """, unsafe_allow_html=True)
 
-# ========== 页面标题与说明 ==========
+# ========== 页面标题 ==========
 st.markdown("<h1>💧 Pervious Concrete Compressive Strength Prediction</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;'>Enter the following 8 parameters to predict the compressive strength of pervious concrete (MPa).</p>", unsafe_allow_html=True)
 
-# ========== 文件路径检查 ==========
+# ========== 文件路径 ==========
 MODEL_PATH = "final_catboost_model.pkl"
 SCALER_PATH = "scaler.pkl"
 
 if not os.path.exists(MODEL_PATH) or not os.path.exists(SCALER_PATH):
     st.error("⚠️ Model or scaler file is missing. Please check the file paths.")
 else:
-    # 加载模型和标准化器
     model = joblib.load(MODEL_PATH)
     scaler = joblib.load(SCALER_PATH)
 
-    # 输入参数布局
+    # ========== 输入界面 ==========
     with st.container():
         col1, col2 = st.columns(2)
 
@@ -107,7 +96,7 @@ else:
             Shape = 1 if shape_option == "Cylinder" else 2
             Height = st.number_input("Specimen Height", min_value=0.0, value=200.0, step=1.0)
 
-    # 预测按钮
+    # ========== 预测按钮 ==========
     predict_btn = st.button("🔮 Predict Compressive Strength")
 
     if predict_btn:
@@ -117,12 +106,32 @@ else:
             input_scaled = scaler.transform(input_data)
             prediction = model.predict(input_scaled)[0]
 
-            # 显示结果卡片
+            # 显示预测结果
             st.markdown(f"""
             <div class='result-box'>
                 <div class='result-value'>Predicted Compressive Strength: {prediction:.2f} MPa</div>
             </div>
             """, unsafe_allow_html=True)
+
+            # ========== 特征重要性分析 ==========
+            st.markdown("### 📊 Feature Importance Analysis")
+
+            # 获取特征重要性
+            try:
+                importances = model.get_feature_importance()
+            except Exception:
+                st.warning("This model does not support feature importance extraction.")
+                importances = None
+
+            if importances is not None:
+                feature_names = ["W/C", "A/C", "Dmin", "ASR", "Porosity", "Shape", "Diameter", "Height"]
+                fig, ax = plt.subplots(figsize=(8, 4))
+                ax.barh(feature_names, importances, color="#007bff", alpha=0.8)
+                ax.set_xlabel("Feature Importance (Weight)")
+                ax.set_ylabel("Input Parameters")
+                ax.set_title("Feature Influence on Prediction")
+                ax.invert_yaxis()
+                st.pyplot(fig)
 
         except Exception as e:
             st.error(f"❌ An error occurred during prediction: {e}")
